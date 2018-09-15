@@ -1,0 +1,95 @@
+环境
+yum -y install gcc pcre-devel openssl-devel zlib-devel
+yum -y install httpd-tools  安装apache工具
+yum install net-tools   安装netstat命令
+
+
+vim /usr/local/nginx/conf/nginx.conf
+deny （IP）;  禁止ip
+deny （all）；  禁止全部
+allow （IP）；  允许IP
+allow  （all）； 允许全部
+
+源码安装
+shell > tar xvf nginx-1.12.2.tar.gz
+shell > cd nginx-1.12.2
+shell > ./configure --prefix=/usr/local/nginx-1.12.2 --with-http_ssl_module
+shell > make && make install
+
+shell >ln -s /usr/local/nginx-1.12.2  /usr/local/nginx
+
+启动 /usr/local/nginx/sbin/nginx
+关闭 /usr/local/nginx/sbin/nginx -s stop
+重载 /usr/local/nginx/sbin/nginx -s reload
+
+调用脚本在/etc/init.d目录下  放个nginx的脚本 chmod +x nginx
+service nginx start|stop|restart
+
+cd /usr/local/nginx/html/(创建目录)/XXXXX
+
+vim /usr/local/nginx/conf/nginx.conf
+
+server { 
+listen  8080；
+server_name (IP或者域名)
+location / {
+root  html/(默认目录);
+index  index.html(默认网页开启目录功能后可以关闭);
+}
+error_page   500  502 503 504  /50x.html;
+location = /50x.html {
+root  html:
+}
+
+localtion ~ \.(png|jpg|jepg)$ {
+expires 15d;  15天
+}
+}
+service nginx restart
+
+Gzip压缩
+gzip on：                  开启GZIP压缩
+gzip_http_version  1.0      http协议版本
+gzip_disable 'MSIE [1-6]';   禁止IE 6以下使用
+gzip_types image/jpeg image/jpg;  使用hpeg支持JPG格式的图片
+
+service nginx restart
+
+加密文本: 由htpasswd命令实现
+htpasswd  -c 生成到的路径  用户名
+
+vim /usr/local/nginx/conf/nginx.conf
+auth_basic “提示信息”
+auth_basic_user_file  /etc/nginx/htpasswd;
+
+升级和安装
+shell > tar xvf nginx-1.14.0.tar.gz 
+shell > cd nginx-1.14.0
+shell > ./configure --prefix=/usr/local/nginx --with-http_ssl_module
+shell > make && make install
+
+cd /usr/local/nginx/sbin 
+nginx 和 nginx.old
+./nginx.old -v
+
+新版本和旧版本同时运行  注意新版本和旧版本的端口号不能冲突（可在conf文件里面进行修改）
+
+kill -WINCH 进程号
+优雅的关闭的子进程
+
+ps aux | grep nginx
+
+
+ngx第三方模块安装
+shell > tar zxvf ngx-fancyindex-v0.4.2.tar.gz
+shell > cd /Packup/nginx-1.14.0                   进入nginx的解压路径
+shell > ./configure --prefix=/usr/local/nginx --with-http_ssl_module --add-module=/Packup/ngx-fancyindex-0.4.2/              找到软件模块解压路径
+shell > make && make install
+
+修改conf文件里面添加
+fancyindex on;                开启显示目录文件
+fancyindex_exact_size off;    以可读性更好的方式显示大小
+
+
+
+
